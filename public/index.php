@@ -23,6 +23,8 @@ require __DIR__ . '/../src/dependencies.php';
 // Register middleware
 require __DIR__ . '/../src/middleware.php';
 
+require __DIR__ . '/../src/IgbSoapLogin.php';
+
 // Register routes
 require __DIR__ . '/../src/routes.php';
 
