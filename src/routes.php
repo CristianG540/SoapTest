@@ -25,12 +25,12 @@ $app->get('/login', function ($request, $response) {
         );
         $soapRes = $login->call('Login', $params);
 
-        return json_encode([
+        return $response->withJson([
             'status' => 201,
             'data' => $soapRes
         ]);
     }else{
-        return json_encode([
+    	return $response->withJson([
             'status' => 500
         ]);
     }
@@ -48,23 +48,23 @@ $app->get('/logout/{sessionid}', function ($request, $response, $args) {
 
         $soapRes = $logout->call('Logout', '<Logout xmlns="LoginService" />');
 
-        return json_encode([
+        return $response->withJson([
             'status' => 201,
             'data' => $soapRes
         ]);
     }else{
-        return json_encode([
+        return $response->withJson([
             'status' => 500
         ]);
     }
 
 });
 
-$app->get('/orders/{sessionid}', function ($request, $response, $args) {
-
+$app->get('/orders', function ($request, $response, $args) use ($app) {
+    $sessionId = $request->getParam('sessionId');
     $order = new nusoap_client("http://b1ws.igbcolombia.com/B1WS/WebReferences/OrdersService.wsdl", true);
     $paramsH = [
-        'SessionID'   => (isset($args['sessionid']) && $args['sessionid'] ) ? $args['sessionid'] : '',
+        'SessionID'   => (isset($sessionId) && $sessionId ) ? $sessionId : '',
         'ServiceName' => 'OrdersService'
     ];
     $order->setHeaders(['MsgHeader' => $paramsH]);
@@ -89,12 +89,12 @@ $app->get('/orders/{sessionid}', function ($request, $response, $args) {
             	. '</Add>'
                 );
 
-        return json_encode([
+        return $response->withJson([
             'status' => 201,
             'data' => $soapRes
         ]);
     }else{
-        return json_encode([
+        return $response->withJson([
             'status' => 500
         ]);
     }

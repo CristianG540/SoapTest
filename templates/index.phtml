@@ -30,7 +30,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
         <script src="https://unpkg.com/vue"></script>
-        <script type="text/javascript" src="<?= $basePath ?>/js/mainModule.js"></script>
+
     </head>
     <body>
 
@@ -41,21 +41,19 @@
                     <h1>Soap</h1>
                     <br>
                     <div class="form-actions">
-                        <button class="btn btn-success" type="button" @click="getData"><i class="fa fa-spinner"></i> Loguearse</button>
-                        <button class="btn btn-info" type="button" @click="getData"><i class="fa fa-spinner"></i> Ordenar</button>
-                        <button class="btn btn-danger" type="button" @click="getData"><i class="fa fa-spinner"></i> Logout</button>
+                        <button class="btn btn-success" type="button" @click="login"><i class="fa fa-spinner"></i> Loguearse</button>
+                        <button class="btn btn-info" type="button" :disabled="!sessionId" @click="ordenar"><i class="fa fa-spinner"></i> Ordenar</button>
+                        <button class="btn btn-danger" type="button" :disabled="!sessionId" @click="logout"><i class="fa fa-spinner"></i> Logout</button>
                     </div>
+                </div>
+                <br>
+                <div class="row">
+                    <template v-if="sessionId"> <strong>SessionId:</strong> {{ sessionId }} <br></template>
+                    <template v-if="docEntry"> <strong>DocEntry:</strong> {{ docEntry }} <br></template>
                 </div>
             </div>
         </div>
 
-
-
-        <?php if (isset($name)) : ?>
-            <h2>Hello <?= htmlspecialchars($name); ?>!</h2>
-        <?php else: ?>
-            <?= var_dump($data); ?>
-        <?php endif; ?>
-
+        <script type="text/javascript" src="<?= $basePath ?>/js/mainModule.js"></script>
     </body>
 </html>

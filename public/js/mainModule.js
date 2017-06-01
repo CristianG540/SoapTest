@@ -6,27 +6,51 @@ var modMain = new Vue({
 
     },
     data : {
-
+        sessionId : '',
+        docEntry  : ''
     },
     methods : {
-        procesar : function(){
-            $("#modal").modal('show');
+        login : function(){
             var scope = this;
-            $.get(BASEURL + '/cacheBoletin/BoletinProcesar', {
-                idPer  : this.periodo,
-                idSede : this.sede
-            })
-            .done(function(data){
-                if(data.status == 201){
-                    $("#modal").modal('hide');
-                    toastr.success('Información procesada con éxito.');
+            $.get(BASEURL + '/login')
+            .done(function(d){
+                if(d.status == 201){
+                    scope.sessionId = d.data.SessionID;
+                    toastr.success('Información procesada con éxito, su Id de sesión es : '+scope.sessionId);
                 }else{
-                    scope.failReq(data);
+                    scope.failReq(d);
                 }
             })
             .fail(this.failReq);
-            toastr.info('Se esta procesando la informacion, espere por favor.');
-
+        },
+        ordenar : function(){
+            var scope = this;
+            $.get(BASEURL + '/orders', {
+                sessionId : this.sessionId
+            })
+            .done(function(d){
+                if(d.status == 201){
+                    scope.docEntry = d.data.DocumentParams.DocEntry;
+                    toastr.success('Información procesada con éxito.');
+                }else{
+                    scope.failReq(d);
+                }
+            })
+            .fail(this.failReq);
+        },
+        logout : function(){
+            var scope = this;
+            $.get(BASEURL + '/logout/'+scope.sessionId)
+            .done(function(d){
+                if(d.status == 201){
+                    scope.sessionId = '';
+                    scope.docEntry = '';
+                    toastr.success('Se deslogueo con exito.');
+                }else{
+                    scope.failReq(d);
+                }
+            })
+            .fail(this.failReq);
         },
         failReq: function (e) {
             toastr.error('Error al procesar la peticion, revise la consola para mas informacion: '+e.error);
@@ -35,7 +59,7 @@ var modMain = new Vue({
     },
     computed : {
         validData : function() {
-            return !( this.periodo && this.sede );
+            return ( this.sessionId != '' );
         },
     }
 });
