@@ -6,7 +6,7 @@ $app->get('/', function ($request, $response) {
     $this->logger->info("Slim-Skeleton '/' route");
 
     // Render index view
-    return $this->renderer->render($response, 'index.phtml', ['data' => '' ]);
+    return $this->renderer->render($response, 'index.phtml', ['basePath' => $request->getUri()->getBaseUrl() ]);
 });
 
 $app->get('/login', function ($request, $response) {
@@ -58,5 +58,45 @@ $app->get('/logout/{sessionid}', function ($request, $response, $args) {
         ]);
     }
 
+});
+
+$app->get('/orders/{sessionid}', function ($request, $response, $args) {
+
+    $order = new nusoap_client("http://b1ws.igbcolombia.com/B1WS/WebReferences/OrdersService.wsdl", true);
+    $paramsH = [
+        'SessionID'   => (isset($args['sessionid']) && $args['sessionid'] ) ? $args['sessionid'] : '',
+        'ServiceName' => 'OrdersService'
+    ];
+    $order->setHeaders(['MsgHeader' => $paramsH]);
+    $error  = $order->getError();
+    if(!$error){
+        $soapRes = $order->call('Add', ''
+                . '<Add>'
+                    . '<Document>'
+	                    . '<Confirmed>N</Confirmed>'
+	                    . '<CardCode>c10026162</CardCode>'
+	                    . '<Comments>orden de prueba por webservice</Comments>'
+	                    . '<DocDueDate>2017-06-22</DocDueDate>'
+	                    . '<NumAtCard>pedidoweb 2</NumAtCard>'
+	                    . '<DocumentLines>'
+                    		. '<DocumentLine>'
+                    			. '<LineNum>0</LineNum>'
+                    			. '<ItemCode>RP169Q51</ItemCode>'
+                    			. '<Quantity>2</Quantity>'
+                    		. '</DocumentLine>'
+                		. '</DocumentLines>'
+                	. '</Document>'
+            	. '</Add>'
+                );
+
+        return json_encode([
+            'status' => 201,
+            'data' => $soapRes
+        ]);
+    }else{
+        return json_encode([
+            'status' => 500
+        ]);
+    }
 });
 
